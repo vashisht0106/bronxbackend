@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Streaming</title>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+  <!--<input type="'text" id="demo"/>-->
+  <text>layout1</text><br/>
+  <input type="'number" id="width" placeholder="width"/>
+  <input type="'number" id="height" placeholder="height"/>
+  
+  <button id="sendBtn">send</button>
+
+
+  <input type="'number" id="screen" placeholder="change layout"/>
+  <button id="changeScreen">change screen</button>
+
+  <script>
+
+const socket = io();
+
+
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from server');
+});
+
+      const width=document.getElementById('width');
+      const height=document.getElementById('height');
+      const sendbtn=document.getElementById('sendBtn')
+      sendbtn.addEventListener('click',(e)=>{
+const message={
+  width:width.value,
+  height:height.value
+};
+console.log('value',message);
+socket.emit("layout",message)
+socket.on('message',(message)=>console.log(message))
+
+})
+
+
+const screen=document.getElementById('screen')
+const changeScreen=document.getElementById('changeScreen')
+changeScreen.addEventListener('click',(e)=>{
+  const screenvalue=screen.value;
+  console.log('screenvalue',screenvalue)
+  socket.emit('screenvalue',screenvalue);
+  socket.on('message',(message)=>console.log(message))
+})
+
+
+
+  </script>
+</body>
+</html>
