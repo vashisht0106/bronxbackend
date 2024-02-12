@@ -14,11 +14,11 @@ eventEmitter.on('eventID', (eventID) => {
 
 exports.eventController = async (req, res) => {
   try {
-    const {title,startdate , enddate, starttime , endtime, layoutstyle, source, } = req.body;
+    const {title,startdate , enddate, starttime , endtime, layoutstyle, source,mediaid } = req.body;
 
     // Validate input (you may need to adjust the validation logic)
-    if (!starttime || !startdate || !endtime || !enddate || !layoutstyle || !source || !title) {
-      return res.status(400).json({success:false, error: "All fields are required" });
+    if (!starttime || !startdate || !endtime || !enddate || !layoutstyle || !source || !title||!mediaid) {
+      return res.status(404).json({success:false, error: "All fields are required" });
     }
 
     // Create a new event instance
@@ -30,6 +30,7 @@ exports.eventController = async (req, res) => {
       endtime,
       layoutstyle,
       source,
+      mediaid
     });
 
     // Save the event to the database
@@ -75,7 +76,7 @@ exports.videoController=async(req,res)=>{
 // const HandelChangeEvent=async(eid)=>{
 
 //let eventid=storedEventID;wwww
-const {eventid}=req.params
+const {eventid}=req.params;
   // console.log('eventid',eid)
 
  

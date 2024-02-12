@@ -6,8 +6,10 @@ const mongoose=require('mongoose')
 const image=require('./Route/imageRoute');
 const folder=require('./Route/folderRoute')
 const events=require('./Route/EventRoute')
+const user=require('./Route/userRoute')
+const mediaplayer=require('./Route/mediaplayerRoute')
 const cors = require('cors');
-
+const cookieParser=require('cookie-parser')
 
 
 const fs = require('fs');
@@ -31,10 +33,13 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,  // Allow credentials like cookies to be sent
 }));
+app.use(cookieParser());
 app.use('/api/v1',image);
 app.use('/api/v1',folder);
 app.use('/api/v1',events);
 
+app.use('/api/v1',user)
+app.use('/api/v1',mediaplayer);
 
 
 const server=http.createServer(app)

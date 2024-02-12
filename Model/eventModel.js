@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const eventSchema = new mongoose.Schema({
   eventid:{type:String,default:generateRandom5DigitHexString},
+  mediaid:{type:String,required:true},
   title: { type: String, required: true },
   startdate: { type: String, required: true },
   enddate: { type: String, required: true },
