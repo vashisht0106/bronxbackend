@@ -49,7 +49,7 @@ app.use('/api/v1',events);
 
 app.use('/api/v1',user)
 app.use('/api/v1',mediaplayer);
-app.use(express.static(path.join(__dirname, './frontend/build')));
+//app.use(express.static(path.join(__dirname, './frontend/build')));
 
 const server=http.createServer(app)
 
@@ -72,9 +72,9 @@ app.get('/socket',(req,res)=>{
 
 })
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './frontend/build/index.html'));
-});
+//app.get('*', (req, res) => {
+//  res.sendFile(path.join(__dirname, './frontend/build/index.html'));
+//});
 
 
 server.listen(process.env.PORT||8000,()=>{
