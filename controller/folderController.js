@@ -43,7 +43,7 @@ try {
 
 
 } catch (error) {
-  res.status(500).joson({success:false,message:'error fetching folder!'})
+  res.status(500).json({success:false,message:'error fetching folder!'})
 }
 
 
