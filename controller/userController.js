@@ -37,7 +37,7 @@ else{
 
     const token = user.jwtToken();
 
-    res.status(201).cookie('token', token, option).json({ success: true, user, token })
+res.status(201).cookie('token', token, option,).json({ success: true, token,user })
 
 }
 });
@@ -49,7 +49,7 @@ exports.loginUser = async (req, res, next) => {
         const { email, password } = req.body;
 
         // Check if email and password are provided
-        if (!email || !password) {
+        if (!(email && password)) {
             return res.status(400).json({ success: false, message: 'Email and password cannot be empty' });
         }
 
@@ -69,7 +69,13 @@ exports.loginUser = async (req, res, next) => {
         const token = user.jwtToken()
 
         // Send token as cookie
-        res.status(200).cookie('token', token, option).json({ success: true, token, user })
+        res.cookie('token', token, 
+         option,
+         {httpOnly:true,}
+         
+         
+         
+         ).json({ success: true, token, user} )
     } catch (error) {
         // Handle any errors
         console.error(error);
@@ -138,27 +144,45 @@ exports.logoutUser = async (req, res, next) => {
 
 
 
-exports.authanticatedUser = Asyn(async (req, res, next) => {
-    //try {
-        let token = req.cookies;
-        console.log('token',token)
-        //if (!token) {
-        //    return res.status(401).json({ success: false, message: "Unauthorized: Access Denied" });
-        //}
+exports.authanticatedUser = async(req, res, next) => {
+    try {
+        let {token} = req.cookies;
 
-        // Verifying the JWT token
-    //    let decoded = jwt.verify(token, process.env.JWT_SECRET);
+        //console.log(token)
+        console.log(token)
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Unauthorized: Access Denied" });
+        }
 
-    //    // Finding the user by ID from the decoded token
-    //    req.user = await userSchema.findById(decoded.id);
+      
 
-    //    // Call the next middleware function
-    //    next();
-    //} catch (error) {
-    //    // Handle any errors during token verification or user retrieval
-    //    res.status(401).json({ success: false, message: 'Authentication failed' ,error});
-    //}
-});
+        jwt.verify(token, process.env.JWT_SECRET,async(err, decoded) => {
+            if (err) {
+                console.error(err);
+                return res.status(401).json({ success: false, message: 'Invalid token' });
+            }
+            console.log(decoded.id)
+       
+            const user=await userSchema.findById(decoded.id,)
+            req.user=user;
+       
+
+            if (!user) {
+                return res.status(401).json({ success: false, message: 'User not found' });
+            }
+    
+//   console.log(req.user)
+        next(); // Move to the next middleware
+        })
+        
+
+        }
+    catch(error){
+        console.log(error)
+        // Handle any errors during token verification or user retrieval
+        res.status(401).json({ success: false, error});
+    }
+};
 
 
 exports.Authoriserole = (...roles) => {
@@ -177,13 +201,19 @@ exports.Authoriserole = (...roles) => {
 
 
 
-exports.getUserDetail=Asyn(async(req,res,next)=>{
+exports.loadUser=Asyn(async(req,res,next)=>{
 
-
+try {
     const user = await userSchema.findById(req.user.id);
-    
+    //console.log(decoded.id)
     // let token=jwtToken()
     res.status(200).json({success:true,user})
+} catch (error) {
+   console.log(error) 
+   res.status(500).json({success:false,message:"invernal server error"})
+
+}
+
     
     });
     

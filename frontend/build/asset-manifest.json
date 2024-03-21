@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c38bdc03.css",
+    "main.js": "/static/js/main.df1543de.js",
+    "static/js/787.34ffc281.chunk.js": "/static/js/787.34ffc281.chunk.js",
+    "static/media/loginbackgrund.webp": "/static/media/loginbackgrund.cb6ad6cc7a6da9484b34.webp",
+    "static/media/fileicon.png": "/static/media/fileicon.5666b2a627cc688e991a.png",
+    "static/media/bronxlogo.png": "/static/media/bronxlogo.c5f0359ca44d0c07e920.png",
+    "index.html": "/index.html",
+    "main.c38bdc03.css.map": "/static/css/main.c38bdc03.css.map",
+    "main.df1543de.js.map": "/static/js/main.df1543de.js.map",
+    "787.34ffc281.chunk.js.map": "/static/js/787.34ffc281.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c38bdc03.css",
+    "static/js/main.df1543de.js"
+  ]
+}

@@ -1,12 +1,13 @@
 const express=require('express');
 //const { authanticatedUser, Authoriserole } = require('../Authantication');
-const { registeruser, loginUser, authanticatedUser, getUserDetail} = require('../controller/userController');
+const { registeruser, loginUser, authanticatedUser, getUserDetail, loadUser, logoutUser} = require('../controller/userController');
 const router=express.Router();
 
 
 router.route('/user/register').post(registeruser);
 router.route('/user/login').post(loginUser)
-router.route('/user/detail').get(authanticatedUser)
+router.route('/user/detail').get(authanticatedUser,loadUser)
+router.route('/user/logout').get(logoutUser)
 
 //router.route('/logout').get(logoutUser)
 //router.route('/password/forget').post(forgetPassword)

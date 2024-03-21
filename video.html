@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Videos</title>
+</head>
+<body>
+    <video id="video1" width="320" height="240" controls></video>
+    <video id="video2" width="320" height="240" controls></video>
+    
+    <script>
+        const eventid = '08df2'; // Replace with the actual event id
+        
+        // Function to load video from backend
+        async function loadVideo(eventid, videoId) {
+            const response = await fetch(`http://localhost:4000/api/v1/video/08df2`);
+            const blob = await response.blob();
+            const videoElement = document.getElementById(videoId);
+            videoElement.src = URL.createObjectURL(blob);
+        }
+        
+        // Load videos when the page is loaded
+        window.onload = async () => {
+            await loadVideo(eventid, 'video1');
+            await loadVideo(eventid, 'video2');
+        };
+    </script>
+</body>
+</html>

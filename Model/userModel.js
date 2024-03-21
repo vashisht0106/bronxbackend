@@ -83,7 +83,7 @@ userSchema.methods.jwtToken= function(){
 return jwt.sign({
     id:this._id},
     process.env.JWT_SECRET,
-    {expiresIn:1*24*60*60*1000},
+    {expiresIn:'1d'},
     
 
 )

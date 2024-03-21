@@ -6,12 +6,12 @@ const eventEmitter=new EventEmitter();
 //const clients = new Map();
 
 
-let socketToEmail=new Map();
+//let socketToEmail=new Map();
 
-let emailToSocket=new Map();
+//let emailToSocket=new Map();
 
-let midToSocket=new Map();
-
+let mediaIDToSocket=new Map();
+let socketToMediaID=new Map();
 
 
 
@@ -29,7 +29,6 @@ function initializeSocket(server) {
 
   io.on('connection', (socket) => {
     console.log('Client connected', socket.id);
-   
     // delete disconnected media
 
    
@@ -50,26 +49,25 @@ eventEmitter.emit('eventID',data);
 
 
 
-socket.on('join',(email,mediaID)=>{
+socket.on('join_mediaplayer',data=>{
+const {mediaID}=data;
+socketToMediaID.set(socket.id,mediaID);
 
-socketToEmail.set(socket.id,email);
+mediaIDToSocket.set(mediaID,socket.id);
+console.log(`Associated mediaplayer ${mediaID} with socketID ${socket.id}`);
 
-emailToSocket.set(email,socket.id);
-console.log(`Associated email ${email} with socketID ${socket.id}`);
 
-if(mediaID){
-
-  midToSocket.set(mediaID,socket.id);
-console.log(`Associated mediaID ${mediaID} with socketID ${socket.id}`);
-
-}
 
 })
 
 
 
 
-
+// Iterate over sockets and send media IDs
+//socketToMediaID.forEach((socket, mediaID) => {
+  //io.emit("mediaIDjson".mediaIDsJSON);
+  
+//});
 
 
 
@@ -109,7 +107,14 @@ socket.on('message', function incoming(message) {
 })
 
 
+socket.on('style',data=>{
 
+const {mediaID,}=data;
+console.log(mediaID)
+sendStyleByMid(io,mediaID,data)
+
+
+})
 
 
 
@@ -130,11 +135,10 @@ socket.on('message', function incoming(message) {
 
 
 socket.on('disconnect', () => {
-  const email = socketToEmail.get(socket.id);
-  if (email) {
-      socketToEmail.delete(socket.id);
-      emailToSocket.delete(email);
-      console.log(`Removed association for email ${email} and socketID ${socket.id}`);
+  const mediaID = socketToMediaID.get(socket.id);
+  if (mediaID) {
+      socketToMediaID.delete(socket.id);
+      console.log(`Removed association for email ${mediaID} and socketID ${socket.id}`);
   }
   console.log(`Client disconnected with socketID ${socket.id}`);
 });
@@ -156,24 +160,41 @@ socket.on('disconnect', () => {
 
 
 function sendMessageByMid(io, mediaID, message) {
-  const socketID = midToSocket.get(mediaID);
-  console.log("mediaIDinsendmessagefunction",socketID)
-  if (socketID) {
-    const socket = io.sockets.sockets.get(socketID);
-    if (socket) {
-      socket.emit('message', message);
-      console.log(`Message sent to client with mid ${mediaID}`);
-    } else {
-      console.log(`Socket not found for mid ${mediaID}`);
-    }
-  } else {
-    console.log(`No socket associated with mid ${mediaID}`);
-  }
+  const socketID = mediaIDToSocket.get(mediaID);
+  console.log("medieID to socket ID",socketID)
+  console.log("medieID to socket ID",mediaID)
+
+
+
+io.to(socketID).emit('message',message)
+
+  //if (socketID) {
+  //  console.log("socketID",socketID)
+  //  const socket = io.sockets.sockets.get(socketID);
+  //  console.log("socket",socket)
+  //  if (socket) {
+  //    socket.emit('message', message);
+  //    console.log(`Message sent to client with mid ${mediaID}`);
+  //  } else {
+  //    console.log(`Socket not found for mid ${mediaID}`);
+  //  }
+  //} else {
+  //  console.log(`No socket associated with mid ${mediaID}`);
+  //}
 }
 
 
 
+function sendStyleByMid(io,mediaID,data){
+console.log("send Style function called",mediaID)
+  const socketID = mediaIDToSocket.get(mediaID);
+  console.log("medieID to socket ID",socketID)
 
+
+
+io.to(socketID).emit('style',data)
+
+}
 
 
 

@@ -11,6 +11,7 @@ const mediaplayer=require('./Route/mediaplayerRoute')
 const cors = require('cors');
 const cookieParser=require('cookie-parser')
 
+app.use(cookieParser());
 
 const fs = require('fs');
 const http=require('http');
@@ -33,14 +34,22 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,  // Allow credentials like cookies to be sent
 }));
-app.use(cookieParser());
+
+app.use(function(req,res,next){
+
+res.header("Access-Control-Allow-Origin","*");
+res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content_Type,Accept");
+next()
+});
+
+
 app.use('/api/v1',image);
 app.use('/api/v1',folder);
 app.use('/api/v1',events);
 
 app.use('/api/v1',user)
 app.use('/api/v1',mediaplayer);
-
+app.use(express.static(path.join(__dirname, './frontend/build')));
 
 const server=http.createServer(app)
 
@@ -63,6 +72,9 @@ app.get('/socket',(req,res)=>{
 
 })
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, './frontend/build/index.html'));
+});
 
 
 server.listen(process.env.PORT||8000,()=>{
