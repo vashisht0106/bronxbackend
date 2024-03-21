@@ -281,23 +281,6 @@ exports.videoController=async(req,res)=>{
       partialVideoStream.pipe(res);
     }
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   }
    catch (error) {
     console.log(error)
@@ -308,10 +291,134 @@ exports.videoController=async(req,res)=>{
   }
   
 
+exports.imageController = async(req,res)=>{
+
+  const { eventid, source } = req.params;
+
+  try {
+    const event = await eventModel.find({
+      $and: [
+        { eventid: { $regex: eventid, $options: 'i' } },
+        // Add more conditions if needed
+      ]
+    });
+
+    if (event.length === 0) {
+      res.status(404).send('Event not found');
+      return;
+    }
+
+    const imagePath = path.join('uploads', source); // Path to your image
+console.log(imagePath)
+    // Read the image file
+    fs.readFile(imagePath, (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Error reading image file');
+        return;
+      }
+
+      // Set the appropriate headers and send the image data as the response
+      res.writeHead(200, {
+        'Content-Type': 'image/jpeg',
+        'Content-Length': data.length
+      });
+      res.end(data);
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 
 
 
+
+exports.mediaController = async (req, res) => {
+  const { eventid, source } = req.params;
+
+  try {
+    const event = await eventModel.find({
+      $and: [
+        { eventid: { $regex: eventid, $options: 'i' } },
+        // Add more conditions if needed
+      ]
+    });
+
+    if (event.length === 0) {
+      res.status(404).send('Event not found');
+      return;
+    }
+
+    const filePath = path.join('uploads', source); // Path to your video or image file
+    const fileExtension = path.extname(filePath).toLowerCase();
+
+    // Check if the file is a video or an image
+    if (fileExtension === '.mp4' || fileExtension === '.mov' || fileExtension === '.avi') {
+      // Handling video streaming
+      const fileSize = fs.statSync(filePath).size;
+      const videoStream = fs.createReadStream(filePath, { highWaterMark: 10 * 1024 * 1024 });
+
+      const rangeHeader = req.headers.range;
+      if (!rangeHeader) {
+        // No range requested, send the entire video
+        res.writeHead(200, {
+          'Content-Length': fileSize,
+          'Content-Type': 'video/mp4',
+        });
+        videoStream.pipe(res);
+      } else {
+        // Parse the range header
+        const ranges = rangeParser(fileSize, rangeHeader);
+
+        if (ranges === -1) {
+          // Invalid range
+          res.status(416).send('Invalid Range');
+          return;
+        }
+
+        // Only support single range for simplicity
+        const { start, end } = ranges[0];
+        const contentLength = end - start + 1;
+
+        // Send the partial content (range) response
+        res.writeHead(206, {
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': contentLength,
+          'Content-Type': 'video/mp4',
+        });
+        const partialVideoStream = fs.createReadStream(filePath, { start, end });
+        partialVideoStream.pipe(res);
+      }
+    } else if (fileExtension === '.jpg' || fileExtension === '.jpeg' || fileExtension === '.png') {
+      // Handling image streaming
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Error reading image file');
+          return;
+        }
+
+        // Set the appropriate headers and send the image data as the response
+        res.writeHead(200, {
+          'Content-Type': 'image/jpeg',
+          'Content-Length': data.length
+        });
+        res.end(data);
+      });
+    } else {
+      // Unsupported file type
+      res.status(415).send('Unsupported Media Type');
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 
 
